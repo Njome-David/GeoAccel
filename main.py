@@ -1,39 +1,61 @@
-from core.acceleration import calcul_acceleration
-from core.acceleration import plus_grand
+from typing import Dict
+from core.acceleration import calcul_acceleration, plus_grand
+from core.models import MODELS
 
-S = 2
-M = " "
-R = " "
-print("Determinons la valeur de lacceleration pour differents chercheurs\n")
 
-while S!=0 and S!=1 :
-    S=int(input("Choissisez la nature du terrain\n Rocher:0 \t Sol:1\n"))
+def ask_int_choice(prompt: str, allowed: tuple = ("0", "1")) -> int:
+    while True:
+        val = input(prompt).strip().lower()
+        if val in allowed:
+            return int(val)
+        print("Valeur invalide — entrez 0 ou 1.")
 
-while True:
+
+def ask_float(prompt: str, min_value: float = None) -> float:
+    while True:
+        try:
+            v = float(input(prompt).strip())
+            if min_value is not None and v < min_value:
+                print(f"Valeur doit être >= {min_value}")
+                continue
+            return v
+        except ValueError:
+            print("Valeur invalide, entrez un nombre.")
+
+
+def compute_for_models(S: int, M: float, R: float) -> Dict[str, float]:
+    results: Dict[str, float] = {}
+    for name, params in MODELS:
+        alpha, beta, gamma, sigma, epsilon, d = params
+        accel = calcul_acceleration(S, M, R, alpha, beta, gamma, sigma, epsilon, d)
+        results[name] = accel
+    return results
+
+
+def print_results(results: Dict[str, float]) -> None:
+    print("\nRésultats (triés) :")
+    for name, val in sorted(results.items(), key=lambda x: x[1], reverse=True):
+        print(f" - {name}: {val:.4e} m/s²")
+    winners, max_val = plus_grand(results)
+    if max_val is None:
+        print("\nAucun résultat calculable.")
+    else:
+        print(f"\nAccélération maximale : {max_val:.4e} m/s²")
+        print("Auteur(s) :", ", ".join(winners))
+
+
+def main() -> None:
+    print("Calculer l'accélération selon différents auteurs\n")
+    S = ask_int_choice("Nature du terrain (0=Rocher, 1=Sol) : ")
+    M = ask_float("Entrez la magnitude (M) : ")
+    R = ask_float("Entrez la distance épicentrale en km (R >= 0) : ", min_value=0.0)
+
+    results = compute_for_models(S, M, R)
+    print_results(results)
+
+
+if __name__ == "__main__":
     try:
-        M=float(input("Entrez la valeur de magnitude\n"))
-        break
-    except ValueError:
-        print("Valeur Invalide")
-
-while True:
-    try:
-        R=float(input("Entrez la valeur de la distane epicentrale en km\n"))
-        break
-    except ValueError:
-        print("Valeur Invalide")
-
-AuteursAcc = {}
-AuteursAcc["Mc Guire"] = calcul_acceleration(S,M,R,0.306,0.89,1.17,0,-0.20,0)
-AuteursAcc["Joyner-Boore"] = calcul_acceleration(S,M,R,0.955,0.573,1.00,0.0059,0,7.3)
-AuteursAcc["Petrovski"] = calcul_acceleration(S,M,R,0.599,0.539,0.844,0,0,0)
-AuteursAcc["Sabette-Pugliese"] = calcul_acceleration(S,M,R,0.274,0.705,1,0,0.389,5.8)
-
-for auteur,val in AuteursAcc.items() :
-    print(f"D'apres {auteur}, L'acceleration est de {val} m/s^2\n")
-
-auteurs_max,max_val = plus_grand(AuteursAcc)
-
-print(f"L'acceleration la plus grande est de {max_val} m/s^2 donnee par\n")
-for max in auteurs_max :
-     print(f"{max}\n")
+        main()
+    except KeyboardInterrupt:
+        print("\nInterrompu par l'utilisateur.")
