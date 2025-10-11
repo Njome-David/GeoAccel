@@ -17,11 +17,22 @@ __pycache__/
 build/
 dist/
 *.egg-info/
+*.egg
+*.whl
+
+#Fichier specifiques a buildozer / Android
+.buildozer/
+bin/
 
 # Test / coverage
 .pytest_cache/
 .coverage
 htmlcov/
+
+#Fichiers temporaires/logs
+*.log
+*.tmp
+*.bak
 
 # OS files
 .DS_Store
