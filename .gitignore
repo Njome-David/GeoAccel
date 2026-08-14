@@ -1,6 +1,7 @@
 # IDEs / editors
 .idea/
 *.iml
+.vscode/
 
 # Virtual environments
 .venv/
@@ -15,7 +16,6 @@ __pycache__/
 
 # Distribution / packaging
 build/
-dist/
 *.egg-info/
 *.egg
 *.whl
@@ -43,3 +43,5 @@ Thumbs.db
 .env.* 
 secrets.*
 *.key
+
+Source code GeoAccel.txt
